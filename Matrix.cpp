@@ -3,9 +3,9 @@
 #include <cmath>
 using namespace std;
 class Matrix {
+public:
     int m_rows, m_cols;
     double *m_values;
-public:
     Matrix(); // По умолчанию создается пустая матрица
     Matrix(int rows, int cols); // Выделяет память, элементы не инициализирует
     Matrix(const Matrix& other); // Копирование матрицы
@@ -42,6 +42,64 @@ public:
     Matrix operator-=(const Matrix& other);
     Matrix operator*=(const Matrix& other);
 };
+//Создание класса-наследника "Vector"
+class Vector : public Matrix {
+public:
+    int length;
+    Vector();
+    Vector(int len);
+    Vector(const Vector& other);
+
+    double norm(); //Норма вектора
+    void printVector(); //Печать в консоль
+    double scalarProduct(const Vector& other); //Скалярное произведение векторов
+    Vector vectorProduct(const Vector& other); //Векторное произведение векторов
+};
+Vector::Vector() : Matrix() {
+    length = 0;
+}
+Vector::Vector(int len) : Matrix(len, 1) {
+    length = len;
+}
+Vector::Vector(const Vector& other) : Matrix(other){
+    length = other.length;
+}
+
+double Vector::norm() {
+    double result = 0;
+    for(int i = 0; i < length; i++) {
+        result += m_values[i] * m_values[i];
+    }
+    return result;
+}
+double Vector::scalarProduct(const Vector& other) {
+    double result = 0;
+    for(int i = 0; i < length; i++) {
+        result += m_values[i] * other.m_values[i];
+    }
+    return result;
+}
+Vector Vector::vectorProduct(const Vector& other) {
+    double x, y, z;
+    if(length != 3 || other.length != 3) {
+        cout << "Error: Vector product is not defined for that type of vectors" << endl;
+    }
+    x = m_values[1] * other.m_values[2] - other.m_values[1] * m_values[2];
+    y = other.m_values[0] * m_values[2] - m_values[0] * other.m_values[2];
+    z = m_values[0] * other.m_values[1] - other.m_values[0] * m_values[1];
+    m_values[0] = x;
+    m_values[1] = y;
+    m_values[2] = z;
+    return *this;
+}
+void Vector::printVector() {
+    cout << "(";
+    for (int i = 0; i < length - 1; i++) {
+        cout << m_values[i] << ", ";
+    }
+    cout << m_values[length - 1] << ")" << endl;
+}
+//--------------------------------------------------------------------------------------------
 Matrix::Matrix() {
     m_rows = 0;
     m_rows = 0;
@@ -347,176 +405,269 @@ Matrix Matrix::operator*= (const Matrix& other){
     return *this;
 }
 int main() {
-    int default_rows; // Номер строк первоначальной матрицы
-    int default_cols; // Номер столбцов первоначальной матрицы
+    int work_mode; //Режим работы программы (Матричный или Векторный)
     int switcher; // Переключатель
-    double mul_num; // Переменная для case(4), число, на которое умножается матрица
-    int exp_num; //Переменная для case(9), степень, в которую возводим матрицу
 
     cout << "Welcome to the matrix calculator!" << endl;
-    cout << "Enter the size of the matrix:" << endl;
-    cout << "Rows: ";
-    cin >> default_rows;
-    cout << "Columns: ";
-    cin >> default_cols;
-    Matrix M(default_rows, default_cols);
-    cout << "Please enter the matrix elements line by line:" << endl;
-    M.readFromKeyboard();
-    /*
-    cout << M.isZero() << " Zero?" << endl;
-    cout << M.isUnit() << " Unit?" << endl;
-    cout << M.isDiagonal() << " Diag?" << endl;
-    cout << M.isSymmetrical() << " Symm?" << endl;
-    cout << M.isUpperTriangular() << " UT?" << endl;
-    cout << M.isLowerTriangular() << " LT?" << endl; 
-    */
-    cout << "Input completed successfully." << endl;
-    cout << "Please, select the operation you want to perform:" << endl;
-    while(1) {
-        cout << endl;
-        cout << "0)Change the initial matrix" << endl;
-        cout << "1)Add a matrix" << endl;
-        cout << "2)Subtract the matrix" << endl;
-        cout << "3)Multiply by the matrix" << endl;
-        cout << "4)Multiply by a number" << endl;
-        cout << "5)Transpose the matrix" << endl;
-        cout << "6)Inverse the matrix" << endl;
-        cout << "7)Determinant of the matrix" << endl;
-        cout << "8)Print current matrix" << endl;
-        cout << "9)Exponentiation of the matrix" << endl;
-        cout << "10)Check matrix type" << endl;
-        cout << "11)Exit" << endl;
+    cout << "Please select the operating mode of the program:" << endl;
+    cout << "1)Matrix mode" << endl;
+    cout << "2)Vector mode" << endl;
+    cin >> work_mode;
+    switch(work_mode){
+        case(1):
+        {
+            int default_rows; // Номер строк первоначальной матрицы
+            int default_cols; // Номер столбцов первоначальной матрицы
+            double mul_num; // Переменная для case(4), число, на которое умножается матрица
+            int exp_num; //Переменная для case(9), степень, в которую возводим матрицу
+
+            cout << "Enter the size of the matrix:" << endl;
+            cout << "Rows: ";
+            cin >> default_rows;
+            cout << "Columns: ";
+            cin >> default_cols;
+            Matrix M(default_rows, default_cols);
+            cout << "Please enter the matrix elements line by line:" << endl;
+            M.readFromKeyboard();
+            /*
+            cout << M.isZero() << " Zero?" << endl;
+            cout << M.isUnit() << " Unit?" << endl;
+            cout << M.isDiagonal() << " Diag?" << endl;
+            cout << M.isSymmetrical() << " Symm?" << endl;
+            cout << M.isUpperTriangular() << " UT?" << endl;
+            cout << M.isLowerTriangular() << " LT?" << endl; 
+            */
+            cout << "Input completed successfully." << endl;
+            cout << "Please, select the operation you want to perform:" << endl;
+            while(1) {
+                cout << endl;
+                cout << "0)Change the initial matrix" << endl;
+                cout << "1)Add a matrix" << endl;
+                cout << "2)Subtract the matrix" << endl;
+                cout << "3)Multiply by the matrix" << endl;
+                cout << "4)Multiply by a number" << endl;
+                cout << "5)Transpose the matrix" << endl;
+                cout << "6)Inverse the matrix" << endl;
+                cout << "7)Determinant of the matrix" << endl;
+                cout << "8)Print current matrix" << endl;
+                cout << "9)Exponentiation of the matrix" << endl;
+                cout << "10)Check matrix type" << endl;
+                cout << "11)Exit" << endl;
 
 
-        cin >> switcher;
-        switch(switcher) {
-            case(0):
-            {
-                cout << "Enter the size of the matrix:" << endl;
-                cout << "Rows: ";
-                cin >> default_rows;
-                cout << "Columns: ";
-                cin >> default_cols;
-                M.resize(default_rows, default_cols);
-                cout << "Please enter the matrix elements line by line:" << endl;
-                M.readFromKeyboard();
-                cout << "Input completed successfully." << endl;
-                cout << "Please, select the operation you want to perform:" << endl;
-                break;
-            }
-            case(1):
-            {
-                cout << "Enter the matrix to be added line by line:" << endl;
-                cout << "Remember that the size of your matrix should be (" << M.rows() << ", " << M.cols() << ")" << endl;
-                Matrix m(default_rows, default_cols);
-                m.readFromKeyboard();
-                cout << "Input completed successfully." << endl;
-                cout << "Result:" << endl;
-                M += m;
-                M.printToScreen();
-                m.~Matrix();
-                break;
-            }
-            case(2):
-            {
-                cout << "Enter the matrix to be subtracted line by line:" << endl;
-                cout << "Remember that the size of your matrix should be (" << M.rows() << ", " << M.cols() << ")" << endl;
-                Matrix m(default_rows, default_cols);
-                m.readFromKeyboard();
-                cout << "Input completed successfully." << endl;
-                cout << "Result:" << endl;
-                M -= m;
-                M.printToScreen();
-                m.~Matrix();
-                break;
-            }
-            case(3):
-            {
-                cout << "Enter the size of the matrix:" << endl;
-                cout << "Remember that the size of your matrix should be (" << M.cols() << ", " << "any" << ")" << endl;
-                cout << "Rows: ";
-                cin >> default_rows;
-                cout << "Columns: ";
-                cin >> default_cols;
-                cout << "Enter the matrix to be multiplied line by line:" << endl;
-                Matrix m(default_rows, default_cols);
-                m.readFromKeyboard();
-                cout << "Input completed successfully." << endl;
-                cout << "Result:" << endl;
-                M *= m;
-                M.printToScreen();
-                m.~Matrix();
-                break;
-            }
-            case(4):
-            {
-                cout << "Enter the number to be multiplied:" << endl;
-                cin >> mul_num;
-                cout << "Input completed successfully." << endl;
-                cout << "Result:" << endl;
-                M.multiply(mul_num);
-                M.printToScreen();
-                break;                
-            }
-            case(5):
-            {
-                M.transpose();
-                M.printToScreen();
-                break;
-            }
-            case(6):
-            {
-                if(M.rows() != M.cols()) {
-                    cout << "Non-square matrix. The inverse matrix is not defined" << endl;
-                    break;
+                cin >> switcher;
+                switch(switcher) {
+                    case(0):
+                    {
+                        cout << "Enter the size of the matrix:" << endl;
+                        cout << "Rows: ";
+                        cin >> default_rows;
+                        cout << "Columns: ";
+                        cin >> default_cols;
+                        M.resize(default_rows, default_cols);
+                        cout << "Please enter the matrix elements line by line:" << endl;
+                        M.readFromKeyboard();
+                        cout << "Input completed successfully." << endl;
+                        cout << "Please, select the operation you want to perform:" << endl;
+                        break;
+                    }
+                    case(1):
+                    {
+                        cout << "Enter the matrix to be added line by line:" << endl;
+                        cout << "Remember that the size of your matrix should be (" << M.rows() << ", " << M.cols() << ")" << endl;
+                        Matrix m(default_rows, default_cols);
+                        m.readFromKeyboard();
+                        cout << "Input completed successfully." << endl;
+                        cout << "Result:" << endl;
+                        M += m;
+                        M.printToScreen();
+                        m.~Matrix();
+                        break;
+                    }
+                    case(2):
+                    {
+                        cout << "Enter the matrix to be subtracted line by line:" << endl;
+                        cout << "Remember that the size of your matrix should be (" << M.rows() << ", " << M.cols() << ")" << endl;
+                        Matrix m(default_rows, default_cols);
+                        m.readFromKeyboard();
+                        cout << "Input completed successfully." << endl;
+                        cout << "Result:" << endl;
+                        M -= m;
+                        M.printToScreen();
+                        m.~Matrix();
+                        break;
+                    }
+                    case(3):
+                    {
+                        cout << "Enter the size of the matrix:" << endl;
+                        cout << "Remember that the size of your matrix should be (" << M.cols() << ", " << "any" << ")" << endl;
+                        cout << "Rows: ";
+                        cin >> default_rows;
+                        cout << "Columns: ";
+                        cin >> default_cols;
+                        cout << "Enter the matrix to be multiplied line by line:" << endl;
+                        Matrix m(default_rows, default_cols);
+                        m.readFromKeyboard();
+                        cout << "Input completed successfully." << endl;
+                        cout << "Result:" << endl;
+                        M *= m;
+                        M.printToScreen();
+                        m.~Matrix();
+                        break;
+                    }
+                    case(4):
+                    {
+                        cout << "Enter the number to be multiplied:" << endl;
+                        cin >> mul_num;
+                        cout << "Input completed successfully." << endl;
+                        cout << "Result:" << endl;
+                        M.multiply(mul_num);
+                        M.printToScreen();
+                        break;                
+                    }
+                    case(5):
+                    {
+                        M.transpose();
+                        M.printToScreen();
+                        break;
+                    }
+                    case(6):
+                    {
+                        if(M.rows() != M.cols()) {
+                            cout << "Non-square matrix. The inverse matrix is not defined" << endl;
+                            break;
+                        }
+                        if(M.Det() == 0) {
+                            cout << "Zero determinant. The inverse matrix doesn`t exist" << endl;
+                            break;
+                        }
+                        M.inversematrix();
+                        M.printToScreen();
+                        break;
+                    }
+                    case(7):
+                    {
+                        if(M.rows() != M.cols()) {
+                            cout << "Non-square matrix. The determinant is not defined" << endl;
+                            break;
+                        }
+                        cout << "Matrix Determinant = " << M.Det() << endl;
+                        break;
+                    }
+                    case(8):
+                    {
+                        M.printToScreen();
+                        break;
+                    }
+                    case(9):
+                    {
+                            cout << "Enter the power:" << endl;
+                            cout << "Remember that the number must be natural" << endl;
+                            cin >> exp_num;
+                            cout << "Input completed successfully." << endl;
+                            cout << "Result:" << endl;
+                            M.matrixPow(exp_num);
+                            M.printToScreen();
+                            break;
+                    }
+                    case(10):
+                    {
+                        M.checkType();
+                        break;
+                    }
+                    case(11):
+                    {
+                        exit(EXIT_SUCCESS);
+                    }
+                    default:
+                    {
+                        cout << "Error: Wrong input" << endl;
+                        exit(EXIT_FAILURE);
+                    }
                 }
-                if(M.Det() == 0) {
-                    cout << "Zero determinant. The inverse matrix doesn`t exist" << endl;
-                    break;
-                }
-                M.inversematrix();
-                M.printToScreen();
-                break;
-            }
-            case(7):
-            {
-                if(M.rows() != M.cols()) {
-                    cout << "Non-square matrix. The determinant is not defined" << endl;
-                    break;
-                }
-                cout << "Matrix Determinant = " << M.Det() << endl;
-                break;
-            }
-            case(8):
-            {
-                M.printToScreen();
-                break;
-            }
-            case(9):
-            {
-                    cout << "Enter the power:" << endl;
-                    cout << "Remember that the number must be natural" << endl;
-                    cin >> exp_num;
-                    cout << "Input completed successfully." << endl;
-                    cout << "Result:" << endl;
-                    M.matrixPow(exp_num);
-                    M.printToScreen();
-                    break;
-            }
-            case(10):
-            {
-                M.checkType();
-                break;
-            }
-            case(11):
-            {
-                exit(EXIT_SUCCESS);
-            }
-            default:
-            {
-                cout << "Error: Wrong input" << endl;
-                exit(EXIT_FAILURE);
             }
         }
+        case(2):
+        {
+            int default_length;
+            cout << "Enter the length of the vector:" << endl;
+            cout << "Length: ";
+            cin >> default_length;
+            Vector V(default_length);
+            cout << "Please enter the vector elements:" << endl;
+            V.readFromKeyboard();
+            cout << "Input completed successfully." << endl;
+            cout << "Please, select the operation you want to perform:" << endl;
+            while(1) {
+                cout << endl;
+                cout << "0)Change the initial vector" << endl;
+                cout << "1)Scalar product" << endl;
+                cout << "2)Vector product" << endl;
+                cout << "3)Print current vector" << endl;
+                cout << "4)Exit" << endl;
+
+                cin >> switcher;
+                switch(switcher) {
+                    case(0):
+                    {
+                        cout << "Enter the length of the vector:" << endl;
+                        cout << "Length: ";
+                        cin >> default_length;
+                        V.resize(default_length, 1);
+                        cout << "Please enter the vector elements:" << endl;
+                        V.readFromKeyboard();
+                        cout << "Input completed successfully." << endl;
+                        cout << "Please, select the operation you want to perform:" << endl;
+                        break;
+                    }
+                    case(1):
+                    {
+                        cout << "Enter the vector with which you want to calculate the scalar product:" << endl;
+                        Vector v(default_length);
+                        v.readFromKeyboard();
+                        cout << "Input completed successfully." << endl;
+                        cout << "Result: " << V.scalarProduct(v) << endl;
+                        v.~Matrix();
+                        break;
+                    }
+                    case(2):
+                    {
+                        if(default_length != 3) {
+                            cout << "Vector product is not defined for a vector of this dimension, it is defined only for 3d vectors" << endl;
+                            break;
+                        }
+                        cout << "Enter the vector with which you want to calculate the vector product:" << endl;
+                        Vector v(default_length);
+                        v.readFromKeyboard();
+                        cout << "Input completed successfully." << endl;
+                        cout << "Result:" << endl;
+                        V.vectorProduct(v);
+                        V.printVector();
+                        v.~Matrix();
+                        break;
+                    }
+                    case(3):
+                    {
+                        V.printVector();
+                        break;
+                    }
+                    case(4):
+                    {
+                        exit(EXIT_SUCCESS);
+                    }
+                    default:
+                    {
+                        cout << "Error: Wrong input" << endl;
+                        exit(EXIT_FAILURE);
+                    }
+                }
+            }
+        }
+        default:
+        {
+            cout << "Error: Wrong input" << endl;
+            exit(EXIT_FAILURE);   
+        }
     }
+    
 }
