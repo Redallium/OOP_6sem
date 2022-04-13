@@ -70,6 +70,7 @@ double Vector::norm() {
     for(int i = 0; i < length; i++) {
         result += m_values[i] * m_values[i];
     }
+    result = sqrt(result);
     return result;
 }
 double Vector::scalarProduct(const Vector& other) {
