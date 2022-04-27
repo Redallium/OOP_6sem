@@ -32,7 +32,6 @@ public:
     void resize(int rows, int cols); // Переопределение размеров матрицы
     void multiply(double value); // Умножение матрицы на число
 
-    int choicefunction(int k, int K); // Вспомогательная для cutmatrix функция
     Matrix cutmatrix(int I, int J); // Алгебраическое дополнение матрицы
     double elemDet(); // Определитель матрицы 2x2
     double Det(); // Определитель произвольной квадратной матрицы
@@ -289,19 +288,12 @@ void Matrix::multiply(double value) {
         m_values[i] *= value;
     }
 }
-int Matrix::choicefunction(int k, int K) {
-    return k - K > 0 ? 1 : 0;
-}
 Matrix Matrix::cutmatrix(int I, int J) {
     Matrix result(m_rows - 1, m_rows - 1);
-    int iflag = 0;
-    int jflag = 0;
     for(int i = 0; i < m_rows; i++) {
         for(int j = 0; j < m_rows; j++) {
-            if(j == J) jflag = 1;
-            if(i == I) iflag = 1;
             if(j != J && i != I) {
-                result.m_values[(i - iflag*choicefunction(i, I)) * (m_rows - 1) + j - jflag*choicefunction(j, J)] = m_values[i * m_rows + j];
+                result.m_values[(i - (i - I > 0 ? 1 : 0)) * (m_rows - 1) + j - (j - J > 0 ? 1 : 0)] = m_values[i * m_rows + j];
             }
         }
     }
@@ -386,7 +378,7 @@ Matrix Matrix::operator-= (const Matrix& other) {
 }
 Matrix Matrix::operator*= (const Matrix& other){
     if (!isMultipliable(other)) {
-        cout << "Error: Matrices aren`t isMultipliable";
+        cout << "Error: Matrices aren`t Multipliable";
         exit(EXIT_FAILURE);
     }
     Matrix result(m_rows, other.m_cols);
